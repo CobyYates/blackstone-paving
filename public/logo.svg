@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="44" viewBox="0 0 240 44" role="img" aria-label="Blackstone Paving and Construction">
+  <g fill="none" stroke="#f2a516" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 30h20l4-6h6"/>
+    <rect x="4" y="12" width="10" height="10" rx="1.5"/>
+    <circle cx="10" cy="34" r="4"/>
+    <circle cx="26" cy="34" r="4"/>
+  </g>
+  <text x="44" y="20" fill="#ffffff" font-family="system-ui, Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="1.5">BLACKSTONE</text>
+  <text x="44" y="36" fill="#f2a516" font-family="system-ui, Arial, sans-serif" font-size="10.5" font-weight="600" letter-spacing="3.4">PAVING &amp; CONSTRUCTION</text>
+</svg>

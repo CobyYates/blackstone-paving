@@ -1,0 +1,28 @@
+# Nuxt dev/build output
+.nuxt
+.output
+.nitro
+.cache
+dist
+
+# Cloudflare / Wrangler
+.wrangler
+
+# Dependencies
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Env — keep the example, ignore real secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.DS_Store
+.idea
+.vscode
+.fleet

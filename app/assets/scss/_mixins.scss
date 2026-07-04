@@ -1,0 +1,62 @@
+// =============================================================================
+// Mixins — auto-injected globally (do NOT @use this file elsewhere).
+// This file needs the tokens directly: `additionalData` injection only applies
+// to entry/component styles, not to files loaded via @use, so we import them here.
+// =============================================================================
+@use './variables' as *;
+
+// Min-width media query. Usage: @include respond(md) { ... }
+@mixin respond($bp) {
+  @if $bp == sm      { @media (min-width: $bp-sm)  { @content; } }
+  @else if $bp == md { @media (min-width: $bp-md)  { @content; } }
+  @else if $bp == lg { @media (min-width: $bp-lg)  { @content; } }
+  @else if $bp == xl { @media (min-width: $bp-xl)  { @content; } }
+  @else { @error "Unknown breakpoint: #{$bp}"; }
+}
+
+// Centered, padded content column.
+@mixin container {
+  width: 100%;
+  max-width: $container-max;
+  margin-inline: auto;
+  padding-inline: $container-pad;
+}
+
+// Vertical section rhythm.
+@mixin section {
+  padding-block: clamp(#{$space-16}, 8vw, #{$space-24});
+}
+
+// Accessible focus ring — apply on interactive elements.
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 3px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+// Visually hide but keep available to screen readers.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Clamp text to N lines.
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Fluid type between two sizes across the sm→xl range.
+@mixin fluid-type($min, $max) {
+  font-size: clamp(#{$min}, calc(#{$min} + 2vw), #{$max});
+}

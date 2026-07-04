@@ -1,0 +1,18 @@
+# Cloudflare Pages configuration.
+# The Nitro `cloudflare-pages` preset builds to ./dist (static assets + _worker.js).
+#
+# Deploy options:
+#   1) Git integration (recommended): connect the repo in the Cloudflare dashboard.
+#        Build command:            npm run build
+#        Build output directory:   dist
+#        Set the NUXT_* env vars under Settings → Environment variables.
+#   2) Direct upload from your machine:  npm run cf:deploy
+
+name = "blackstone-paving"
+compatibility_date = "2025-07-01"
+# Required for Nitro's Node built-in polyfills on Workers/Pages.
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+# Secrets (Storyblok token, EmailJS keys, etc.) are NOT stored here.
+# Add them in the Cloudflare dashboard or with:  wrangler pages secret put <NAME>

@@ -1,0 +1,103 @@
+// =============================================================================
+// Global base layer. Variables + mixins are already injected (do NOT @use them).
+// Keep this file small: reset + element defaults + a few shared utilities only.
+// Component-specific styles belong in each component's scoped <style> block.
+// =============================================================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-body;
+  font-size: $fs-base;
+  line-height: $lh-base;
+  color: $color-text;
+  background-color: $color-bg;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+
+img,
+picture,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+h1, h2, h3, h4 {
+  font-family: $font-heading;
+  line-height: $lh-tight;
+  font-weight: $fw-bold;
+  text-wrap: balance;
+}
+
+h1 { @include fluid-type($fs-3xl, $fs-4xl); }
+h2 { @include fluid-type($fs-2xl, $fs-3xl); }
+h3 { font-size: $fs-xl; }
+h4 { font-size: $fs-lg; }
+
+p { max-width: 68ch; }
+
+a {
+  color: inherit;
+  text-decoration-color: $color-primary;
+  text-underline-offset: 3px;
+  transition: color $transition;
+  @include focus-ring;
+  &:hover { color: $color-primary; }
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  @include focus-ring;
+}
+
+input, textarea, select, button {
+  font: inherit;
+  color: inherit;
+}
+
+// Respect reduced-motion preferences.
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// --- Shared utilities ---
+.container { @include container; }
+.section   { @include section; }
+.visually-hidden { @include visually-hidden; }
+
+// Skip link (accessibility): jumps keyboard users past the nav.
+.skip-link {
+  position: absolute;
+  left: $space-4;
+  top: -100%;
+  z-index: $z-overlay;
+  background: $color-primary;
+  color: $color-primary-contrast;
+  padding: $space-2 $space-4;
+  border-radius: $radius-sm;
+  font-weight: $fw-semibold;
+  &:focus { top: $space-4; }
+}
