@@ -1,8 +1,8 @@
 <template>
   <svg
     class="icon"
-    :width="size"
-    :height="size"
+    :width.attr="size"
+    :height.attr="size"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"

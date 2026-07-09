@@ -38,7 +38,7 @@ const toText = (answer: any): string => {
   return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
-// FAQPage structured data — eligible for rich results in Google.
+// FAQPage structured data - eligible for rich results in Google.
 useSchemaOrg([
   defineWebPage({ '@type': 'FAQPage' }),
   ...items.value.map((item: any) =>

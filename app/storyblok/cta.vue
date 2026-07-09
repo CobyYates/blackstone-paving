@@ -1,5 +1,5 @@
 <template>
-  <section v-editable="blok" class="cta">
+  <section v-editable="blok" class="cta" :class="`cta--${blok.theme || 'amber'}`">
     <div class="container cta__inner">
       <div>
         <h2 v-if="blok.heading">{{ blok.heading }}</h2>
@@ -26,9 +26,6 @@ defineProps<{ blok: Record<string, any> }>()
 
 <style scoped lang="scss">
 .cta {
-  background: linear-gradient(135deg, $color-primary, $color-primary-dark);
-  color: $color-primary-contrast;
-
   &__inner {
     display: flex;
     flex-wrap: wrap;
@@ -38,22 +35,38 @@ defineProps<{ blok: Record<string, any> }>()
     padding-block: $space-16;
   }
 
-  &__text { max-width: 52ch; font-weight: $fw-medium; opacity: 0.9; }
-
-  h2 { color: $color-primary-contrast; }
+  &__text { max-width: 52ch; font-weight: $fw-medium; }
 
   &__actions { display: flex; gap: $space-4; flex-wrap: wrap; }
 
-  // Invert button styling on the amber background.
-  :deep(.btn--primary) {
-    background: $color-black;
-    color: $color-white;
-    &:hover { background: $color-ink; color: $color-white; }
+  // --- amber band: filled primary background with inverted (dark) buttons ---
+  &--amber {
+    background: linear-gradient(135deg, $color-primary, $color-primary-dark);
+    color: $color-primary-contrast;
+
+    h2 { color: $color-primary-contrast; }
+    .cta__text { opacity: 0.9; }
+
+    :deep(.btn--primary) {
+      background: $color-black;
+      color: $color-white;
+      &:hover { background: $color-ink; color: $color-white; }
+    }
+    :deep(.btn--outline) {
+      border-color: $color-black;
+      color: $color-black;
+      &:hover { background: $color-black; color: $color-white; }
+    }
   }
-  :deep(.btn--outline) {
-    border-color: $color-black;
-    color: $color-black;
-    &:hover { background: $color-black; color: $color-white; }
+
+  // --- light band: white background, dark heading, default amber button ---
+  &--light {
+    background: $color-white;
+    color: $color-ink;
+
+    h2 { color: $color-ink; }
+    .cta__text { color: $color-text-muted; }
+    // buttons keep their default (amber primary) styling
   }
 }
 </style>

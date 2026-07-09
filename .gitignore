@@ -16,10 +16,13 @@ logs
 *.log
 npm-debug.log*
 
-# Env — keep the example, ignore real secrets
+# Env - keep the example, ignore real secrets
 .env
 .env.*
 !.env.example
+
+# Local HTTPS certs (mkcert) - generated per machine, never commit
+certs
 
 # Editor / OS
 .DS_Store

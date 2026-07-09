@@ -1,5 +1,5 @@
 <template>
-  <section v-editable="blok" class="contact section" :id="blok.anchor_id || 'contact'">
+  <section v-editable="blok" class="contact section" :id="blok.anchorId || 'contact'">
     <div class="container contact__grid">
       <div class="contact__intro">
         <p v-if="blok.eyebrow" class="eyebrow">{{ blok.eyebrow }}</p>
@@ -13,7 +13,23 @@
         </ul>
       </div>
 
-      <form class="contact__form" novalidate @submit.prevent="onSubmit">
+      <!-- After a successful send the form is replaced by this confirmation, so
+           the request can't be submitted again. `role="status"` announces it. -->
+      <div
+        v-if="status === 'success'"
+        ref="successPanel"
+        class="contact__success"
+        role="status"
+        tabindex="-1"
+      >
+        <span class="contact__success-icon" aria-hidden="true">
+          <AppIcon name="check" :size="30" />
+        </span>
+        <h3 class="contact__success-title">Request received</h3>
+        <p>{{ blok.successMessage || 'Thanks! We’ll be in touch shortly.' }}</p>
+      </div>
+
+      <form v-else class="contact__form" novalidate @submit.prevent="onSubmit">
         <div
           v-for="field in fields"
           :key="field.name"
@@ -68,14 +84,11 @@
 
         <div class="field--full">
           <BaseButton type="submit" :variant="'primary'" block :disabled="status === 'sending'">
-            {{ status === 'sending' ? 'Sending…' : (blok.submit_label || 'Send message') }}
+            {{ status === 'sending' ? 'Sending…' : (blok.submitLabel || 'Send message') }}
           </BaseButton>
         </div>
 
-        <!-- Status is announced to assistive tech. -->
-        <p v-if="status === 'success'" class="form-status form-status--ok" role="status">
-          {{ blok.success_message || 'Thanks! We’ll be in touch shortly.' }}
-        </p>
+        <!-- Errors are announced to assistive tech (success replaces the form above). -->
         <p v-if="status === 'error'" class="form-status form-status--err" role="alert">
           {{ errorMessage }}
         </p>
@@ -106,6 +119,7 @@ const errors = reactive<Record<string, string>>({})
 const honeypot = ref('')
 const status = ref<'idle' | 'sending' | 'success' | 'error'>('idle')
 const errorMessage = ref('')
+const successPanel = ref<HTMLElement | null>(null)
 
 const inputType = (t: string) =>
   ({ email: 'email', tel: 'tel', textField: 'text' } as Record<string, string>)[t] || 'text'
@@ -129,7 +143,11 @@ function validate() {
 }
 
 async function onSubmit() {
-  if (honeypot.value) return // bot
+  // Honeypot: the hidden "company website" field is invisible to humans. If it's
+  // filled, it's a bot - bail out silently and never send.
+  if (honeypot.value) return
+  // Guard against a re-submit if somehow triggered after success.
+  if (status.value === 'success' || status.value === 'sending') return
   if (!validate()) return
 
   const serviceId = config.public.emailjsServiceId as string
@@ -149,6 +167,9 @@ async function onSubmit() {
     await emailjs.send(serviceId, templateId, { ...form }, { publicKey })
     status.value = 'success'
     Object.keys(form).forEach((k) => (form[k] = ''))
+    // Move focus to the confirmation so keyboard/SR users aren't left on the
+    // now-removed submit button.
+    nextTick(() => successPanel.value?.focus())
   } catch (err) {
     console.error('EmailJS send failed:', err)
     status.value = 'error'
@@ -188,6 +209,30 @@ async function onSubmit() {
     grid-template-columns: repeat(2, 1fr);
     align-content: start;
   }
+
+  &__success {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-4;
+    padding: $space-8;
+    background: rgba($color-success, 0.1);
+    border: 1px solid rgba($color-success, 0.3);
+    border-radius: $radius-lg;
+    outline: none; // programmatic focus target; role="status" announces it
+
+    p { color: $color-text-muted; }
+  }
+  &__success-icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-pill;
+    background: rgba($color-success, 0.18);
+    color: $color-success;
+  }
+  &__success-title { font-size: $fs-lg; }
 }
 
 .field {

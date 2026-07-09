@@ -16,9 +16,19 @@ export async function useStory(slug: string) {
   const version = isPreview ? 'draft' : 'published'
 
   // useAsyncStoryblok registers the Bridge for live updates when available.
-  const story = await useAsyncStoryblok(slug, {
-    version,
-    resolveLinks: 'url',
+  // SDK v11 nests options: `api` = Storyblok CDN query params, `bridge` = live
+  // preview options. (Passing flat options silently no-ops and then throws.)
+  // It also returns a wrapper `{ data, story, ... }` - `story` is the computed
+  // ref of the story data (what callers expect as `.value`).
+  const { story } = await useAsyncStoryblok(slug, {
+    api: {
+      version,
+      resolve_links: 'url',
+      // Resolve story references (e.g. the Latest Projects grid) into full
+      // story objects so components can read their content directly.
+      resolve_relations: ['latestProjects.projects'],
+    },
+    bridge: { resolveLinks: 'url', resolveRelations: ['latestProjects.projects'] },
   })
 
   if (!story.value) {

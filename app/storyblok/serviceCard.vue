@@ -14,52 +14,58 @@
       :alt="blok.image.alt || ''"
       width="56"
       height="56"
+      fit="in"
       class="service-card__img"
       loading="lazy"
       provider="storyblok"
     />
-    <h3 class="service-card__title">{{ blok.title }}</h3>
-    <p class="service-card__desc">{{ blok.description }}</p>
+    <div>
+      <h3 class="service-card__title">{{ blok.title }}</h3>
+      <p class="service-card__desc">{{ blok.description }}</p>
+    </div>
   </component>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ blok: Record<string, any> }>()
-const NuxtLink = resolveComponent('NuxtLink')
+const props = defineProps<{ blok: Record<string, any> }>();
+const NuxtLink = resolveComponent("NuxtLink");
 
 // Icon name maps to the AppIcon set (falls back to none if unmatched).
-const KNOWN_ICONS = ['phone', 'mail', 'pin', 'check', 'arrow', 'plus'] as const
+const KNOWN_ICONS = ["phone", "mail", "pin", "check", "arrow", "plus"] as const;
 const icon = computed(() =>
-  props.blok.icon && KNOWN_ICONS.includes(props.blok.icon) ? props.blok.icon : null,
-)
+  props.blok.icon && KNOWN_ICONS.includes(props.blok.icon)
+    ? props.blok.icon
+    : null,
+);
 
 const to = computed(() => {
-  const l = props.blok.link
-  if (!l) return undefined
-  if (l.url) return l.url
-  if (l.cached_url) return `/${String(l.cached_url).replace(/^\//, '')}`
-  return undefined
-})
+  const l = props.blok.link;
+  if (!l) return undefined;
+  if (l.url) return l.url;
+  if (l.cached_url) return `/${String(l.cached_url).replace(/^\//, "")}`;
+  return undefined;
+});
 </script>
 
 <style scoped lang="scss">
 .service-card {
   display: flex;
-  flex-direction: column;
   gap: $space-3;
   height: 100%;
-  padding: $space-8;
+  padding: $space-4;
   background: $color-surface;
   border: 1px solid $color-charcoal;
   border-radius: $radius-lg;
   text-decoration: none;
   color: $color-text;
-  transition: border-color $transition, transform $transition;
+  transition:
+    border-color $transition,
+    transform $transition;
 
-  &:hover {
-    border-color: $color-primary;
-    transform: translateY(-4px);
-  }
+  // &:hover {
+  //   border-color: $color-primary;
+  //   transform: translateY(-4px);
+  // }
 
   &__icon {
     display: grid;
@@ -71,7 +77,20 @@ const to = computed(() => {
     color: $color-primary;
   }
 
-  &__title { font-size: $fs-lg; }
-  &__desc { color: $color-text-muted; font-size: $fs-sm; }
+  &__img {
+    // Contain (don't crop) - show the whole image within the 56×56 box.
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+  }
+
+  &__title {
+    font-size: $fs-lg;
+    color: #f2a516;
+  }
+  &__desc {
+    color: $color-text-muted;
+    font-size: $fs-sm;
+  }
 }
 </style>

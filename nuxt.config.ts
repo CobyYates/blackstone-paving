@@ -1,8 +1,24 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-// Blackstone Paving — Nuxt 4 + Storyblok, deployed to Cloudflare Pages.
+// Blackstone Paving - Nuxt 4 + Storyblok, deployed to Cloudflare Pages.
 // Design goals (see CLAUDE.md): small bundle, fast TTFB, accessible, SEO-complete.
+import { existsSync } from 'node:fs'
+
+// Local HTTPS for the Storyblok Visual Editor. `npm run dev:https` serves over
+// TLS using an mkcert-generated, locally-trusted cert in certs/ (no browser
+// warning). If the certs aren't generated yet it falls back to Nuxt's built-in
+// self-signed cert (the old behaviour). Plain `npm run dev` stays HTTP.
+const httpsDev = process.env.npm_lifecycle_event === 'dev:https'
+const hasCerts =
+  existsSync('certs/localhost.pem') && existsSync('certs/localhost-key.pem')
+const devHttps = httpsDev
+  ? hasCerts
+    ? { key: 'certs/localhost-key.pem', cert: 'certs/localhost.pem' }
+    : true
+  : false
 
 export default defineNuxtConfig({
+  devServer: { https: devHttps },
+
   compatibilityDate: '2025-07-01',
 
   // SSR is ON for SEO parity with the previous WordPress site (server-rendered HTML,
@@ -32,12 +48,15 @@ export default defineNuxtConfig({
       emailjsServiceId: '',   // NUXT_PUBLIC_EMAILJS_SERVICE_ID
       emailjsTemplateId: '',  // NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
       emailjsPublicKey: '',   // NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
-      gtagId: '',             // NUXT_PUBLIC_GTAG_ID (optional analytics)
+      // Analytics (public IDs - safe in the browser). Override per-env with
+      // NUXT_PUBLIC_GTM_ID / NUXT_PUBLIC_GTAG_ID. Injected in app.vue (prod only).
+      gtmId: 'GTM-NLKDP32D',  // NUXT_PUBLIC_GTM_ID  - Google Tag Manager container
+      gtagId: 'G-VELHLHQMLT', // NUXT_PUBLIC_GTAG_ID - GA4 measurement id
     },
   },
 
   // ---------------------------------------------------------------------------
-  // Storyblok — headless CMS + live preview Bridge
+  // Storyblok - headless CMS + live preview Bridge
   // The Bridge injects live updates into the Visual Editor. It only loads inside
   // the Storyblok iframe/preview, so it costs the public visitor nothing.
   // ---------------------------------------------------------------------------
@@ -45,19 +64,19 @@ export default defineNuxtConfig({
     accessToken: process.env.NUXT_STORYBLOK_ACCESS_TOKEN,
     bridge: true, // live preview in the Storyblok Visual Editor
     apiOptions: {
-      region: 'us', // matches the previous space (a-us.storyblok.com)
+      region: 'eu', // matches the "Blackstone Paving" space (eu-central-1)
     },
     componentsDir: '~/storyblok',
   },
 
   // ---------------------------------------------------------------------------
-  // Images — served + optimized through Storyblok's image service (webp/avif,
+  // Images - served + optimized through Storyblok's image service (webp/avif,
   // responsive srcset). Keeps transferred bytes tiny without shipping a lib.
   // ---------------------------------------------------------------------------
   image: {
     provider: 'storyblok',
     storyblok: {
-      baseURL: 'https://a-us.storyblok.com',
+      baseURL: 'https://a.storyblok.com',
     },
     format: ['avif', 'webp'],
     quality: 75,
@@ -86,7 +105,7 @@ export default defineNuxtConfig({
     sources: ['/api/__sitemap__/urls'],
   },
   schemaOrg: {
-    // Global LocalBusiness identity — strong local-SEO signal for a paving company.
+    // Global LocalBusiness identity - strong local-SEO signal for a paving company.
     identity: {
       type: 'LocalBusiness',
       name: 'Blackstone Paving and Construction',
@@ -110,7 +129,7 @@ export default defineNuxtConfig({
   },
 
   // ---------------------------------------------------------------------------
-  // Global styles — SCSS. Variables + mixins are auto-injected into every
+  // Global styles - SCSS. Variables + mixins are auto-injected into every
   // component <style lang="scss"> block, so never re-@use them (avoids
   // "module already loaded"). main.scss holds the reset + base layer.
   // ---------------------------------------------------------------------------
@@ -154,7 +173,7 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: ['/'],
       // Don't fail the whole build if a page can't be prerendered (e.g. missing
-      // CMS token in CI) — it falls back to on-request SSR at the edge.
+      // CMS token in CI) - it falls back to on-request SSR at the edge.
       failOnError: false,
     },
   },

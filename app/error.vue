@@ -26,7 +26,7 @@ const message = computed(() =>
 // clearError resets the error state and navigates.
 const handleError = () => clearError({ redirect: '/' })
 
-useSeoMeta({ title: () => `${title.value} — Blackstone Paving`, robots: 'noindex' })
+useSeoMeta({ title: () => `${title.value} - Blackstone Paving`, robots: 'noindex' })
 </script>
 
 <style scoped lang="scss">

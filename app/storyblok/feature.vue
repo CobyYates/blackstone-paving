@@ -1,5 +1,5 @@
 <template>
-  <section v-editable="blok" class="feature section" :class="{ 'feature--reverse': blok.image_position === 'left' }">
+  <section v-editable="blok" class="feature section" :class="{ 'feature--reverse': blok.imagePosition === 'right' }">
     <div class="container feature__grid">
       <div class="feature__media" v-if="blok.image?.filename">
         <NuxtImg

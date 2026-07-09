@@ -7,7 +7,7 @@ Marketing website for Blackstone Paving and Construction, built with **Nuxt 4**,
 Replaces the previous WordPress site with equivalent SEO (sitemap, robots,
 canonical URLs, Open Graph, and `LocalBusiness` / `FAQPage` structured data).
 
-> Working in this repo with an AI assistant? Read **[CLAUDE.md](./CLAUDE.md)** first —
+> Working in this repo with an AI assistant? Read **[CLAUDE.md](./CLAUDE.md)** first -
 > it defines the accessibility, bundle-size, and SEO rules the project must uphold.
 
 ## Tech stack
@@ -36,12 +36,29 @@ canonical URLs, Open Graph, and `LocalBusiness` / `FAQPage` structured data).
 npm install
 cp .env.example .env      # then fill in the values
 npm run dev               # http://localhost:3000
-npm run dev:https         # https://localhost:3000 — required for Storyblok live preview
+npm run dev:https         # https://localhost:3000 - required for Storyblok live preview
 ```
 
 > Storyblok's Visual Editor loads the site in an HTTPS iframe, so use
-> `npm run dev:https` (Nuxt generates a self-signed cert) when editing content
-> live. Plain `npm run dev` is fine for regular development.
+> `npm run dev:https` when editing content live. Plain `npm run dev` (HTTP) is
+> fine for regular development.
+
+### Trusted local HTTPS (no browser warnings)
+`npm run dev:https` serves TLS from `certs/localhost.pem` if present, otherwise it
+falls back to Nuxt's self-signed cert (which the browser distrusts - hence the
+"proceed anyway" prompt on every load). To get a **locally-trusted** cert so the
+Storyblok iframe just works, generate one once per machine with
+[mkcert](https://github.com/FiloSottile/mkcert):
+
+```bash
+brew install mkcert nss           # nss = Firefox support (skip if not using Firefox)
+mkcert -install                   # trust the local CA (prompts for your password)
+mkcert -cert-file certs/localhost.pem -key-file certs/localhost-key.pem \
+  localhost 127.0.0.1 ::1         # generate the cert into certs/ (git-ignored)
+```
+
+Then `npm run dev:https` loads with a green padlock and no warning. The `certs/`
+folder is git-ignored - every developer generates their own.
 
 ### Environment variables
 See `.env.example`. Summary:
@@ -53,10 +70,11 @@ See `.env.example`. Summary:
 | `NUXT_PUBLIC_EMAILJS_SERVICE_ID` | EmailJS service |
 | `NUXT_PUBLIC_EMAILJS_TEMPLATE_ID` | EmailJS template |
 | `NUXT_PUBLIC_EMAILJS_PUBLIC_KEY` | EmailJS public key |
-| `NUXT_PUBLIC_GTAG_ID` | Google Analytics/Ads id (optional) |
+| `NUXT_PUBLIC_GTM_ID` | Google Tag Manager container id (optional; defaults baked in) |
+| `NUXT_PUBLIC_GTAG_ID` | GA4 measurement id (optional; defaults baked in) |
 
 ## Storyblok setup
-1. Create a space in the **US** region (matches `apiOptions.region: 'us'`).
+1. Create a space in the **EU** region (matches `apiOptions.region: 'eu'`).
 2. In **Settings → Visual Editor**, set the preview URL to
    `https://localhost:3000/` (dev) and your production domain (prod).
 3. Create the content types below (technical name → fields). Each maps 1:1 to a
@@ -67,27 +85,209 @@ See `.env.example`. Summary:
 > `serviceCard`), not snake_case. Vue's component resolver converts hyphens but
 > not underscores, so `service_card` would fail to render. Each name maps to the
 > matching file in `app/storyblok/`.
+>
+> **This applies to *field* names too.** Storyblok auto-generates a field's
+> technical name from its label by camelCasing it - a field labeled **"seo title"**
+> becomes `seoTitle`, **"background image"** becomes `backgroundImage`, etc. The
+> code reads these camelCase names, so label multi-word fields accordingly (or set
+> the technical name explicitly). Don't use snake_case - `seo_title` would not be
+> read.
 
-| Component (technical name) | Key fields |
-|---|---|
-| `page` | `body` (blocks), `title`, `seo_title`, `seo_description`, `keywords`, `og_image` (asset), `no_index` (bool) |
-| `hero` | `eyebrow`, `title`, `subtitle`, `background_image` (asset), `buttons` (blocks: `label`, `link`, `variant`) |
-| `services` | `eyebrow`, `heading`, `subheading`, `items` (`serviceCard` blocks) |
-| `serviceCard` | `icon` (option: phone/mail/pin/check/arrow/plus), `image` (asset, fallback), `title`, `description`, `link` |
-| `feature` | `eyebrow`, `heading`, `text` (richtext), `image`, `image_position` (left/right), `stats` (blocks), `buttons` |
-| `stat` | `value`, `label` (rendered inline by `feature`) |
-| `faq` | `eyebrow`, `heading`, `exclusive` (bool), `items` (`faqItem` blocks) |
-| `faqItem` | `question`, `answer` (richtext) (rendered inline by `faq`) |
-| `gallery` | `eyebrow`, `heading`, `images` (multi-asset) |
-| `cta` | `heading`, `text`, `buttons` |
-| `contactForm` | `eyebrow`, `heading`, `description`, `anchor_id`, `fields` (blocks), `submit_label`, `success_message` |
-| `textBlock` | `content` (richtext) |
+For each block below, create the fields with **exactly** these technical names
+and the listed Storyblok **field type**. The "Field type" is what you pick in the
+Storyblok block schema editor.
+
+**`page`** - root content type. Create stories of this type (see slugs below).
+
+| Field | Field type | Notes |
+|---|---|---|
+| `sections` | Blocks | The page body - allow `hero`, `services`, `feature`, `faq`, `gallery`, `cta`, `contactForm`, `textBlock`, `latestProjects` |
+| `title` | Text | Fallback page title if `seoTitle` is empty |
+| `seoTitle` | Text | `<title>` + OG/Twitter title (label it "seo title") |
+| `seoDescription` | Textarea | Meta description + OG/Twitter description |
+| `keywords` | Text *or* Multi-Options | **Text:** type a comma-separated list (`asphalt paving, fine grading, Grantsville UT`) - passed through verbatim. **Multi-Options:** add each keyword as a separate entry; the array is auto-joined with `, `. (Note: meta keywords carry no real SEO weight - optional.) |
+| `ogImage` | Asset (image) | Social share image; falls back to `image` |
+| `noIndex` | Boolean | `true` → `noindex, nofollow` robots meta |
+
+**`hero`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | Small label above the title |
+| `title` | Text | Rendered as the `<h1>` |
+| `subtitle` | Text | |
+| `backgroundImage` | Asset (image) | Full-bleed background (label it "background image") |
+| `buttons` | Blocks | `button` blocks |
+| `services` | Blocks | `serviceCard` blocks - rendered inside the hero (stacked below the content on mobile, to the right on desktop) |
+
+**`services`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | |
+| `subheading` | Text | |
+| `items` | Blocks | `serviceCard` blocks only |
+
+**`serviceCard`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `icon` | Single-Option | One of: `phone`, `mail`, `pin`, `check`, `arrow`, `plus` |
+| `image` | Asset (image) | Fallback shown only when `icon` is empty |
+| `title` | Text | |
+| `description` | Textarea | |
+| `link` | Link | Makes the whole card a link |
+
+**`feature`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | |
+| `text` | Richtext | |
+| `image` | Asset (image) | |
+| `imagePosition` | Single-Option | `left` or `right` (label it "image position") |
+| `stats` | Blocks | `stat` blocks |
+| `buttons` | Blocks | `button` blocks |
+
+**`stat`** - rendered inline by `feature`.
+
+| Field | Field type | Notes |
+|---|---|---|
+| `value` | Text | e.g. "25+" |
+| `label` | Text | e.g. "years in business" |
+
+**`faq`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | |
+| `exclusive` | Boolean | `true` → only one item open at a time |
+| `items` | Blocks | `faqItem` blocks |
+
+**`faqItem`** - rendered inline by `faq`.
+
+| Field | Field type | Notes |
+|---|---|---|
+| `question` | Text | |
+| `answer` | Richtext | Also fed (as plain text) into FAQ structured data |
+
+**`gallery`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | |
+| `images` | Asset (multiple images) | Each asset's `title` becomes the caption. Set each asset's **Alt text** for accessibility/SEO. |
+
+Clicking a thumbnail opens an accessible **lightbox carousel** (`components/ui/Lightbox.vue`,
+lazy-loaded): native `<dialog>` focus trap, `Esc`/backdrop to close, arrow-key +
+swipe navigation, a live-region counter, and `prefers-reduced-motion` support. The
+grid images stay server-rendered and the block emits `ImageGallery` JSON-LD for
+image SEO.
+
+**`cta`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `heading` | Text | |
+| `text` | Text | |
+| `theme` | Single-Option | `amber` (filled band, default) or `light` (white band, amber button) |
+| `buttons` | Blocks | `button` blocks |
+
+**`contactForm`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | |
+| `description` | Textarea | |
+| `anchorId` | Text | HTML `id` for the section (label it "anchor id"; defaults to `contact`) |
+| `fields` | Blocks | `formField` blocks (optional - a sensible default set is used if empty) |
+| `submitLabel` | Text | Button text (label it "submit label"; defaults to "Send message") |
+| `successMessage` | Text | Shown after a successful send (label it "success message") |
+
+**`formField`** - one input in `contactForm.fields` (data-only block; no `.vue`).
+
+| Field | Field type | Notes |
+|---|---|---|
+| `name` | Text | Also the EmailJS template variable name |
+| `label` | Text | |
+| `type` | Single-Option | `textField`, `email`, `tel`, `textArea`, or `select` |
+| `placeholder` | Text | |
+| `required` | Boolean | |
+| `width` | Single-Option | `50%` or `100%` (grid width) |
+| `options` | Text | Comma-separated choices, only for `type: select` |
+
+**`button`** - used by every `buttons` field above (data-only block; no `.vue`).
+
+| Field | Field type | Notes |
+|---|---|---|
+| `label` | Text | |
+| `link` | Link | Internal story or external URL |
+| `variant` | Single-Option | `primary` or `outline` |
+
+**`textBlock`**
+
+| Field | Field type | Notes |
+|---|---|---|
+| `content` | Richtext | |
+
+**`latestProjects`** - homepage grid of project cards, referencing `project` pages.
+
+| Field | Field type | Notes |
+|---|---|---|
+| `eyebrow` | Text | |
+| `heading` | Text | e.g. "Latest Projects" |
+| `projects` | Multi-Options (source: Stories) | Restricted to `project` pages in the `projects/` folder. Stored as UUIDs; resolved at fetch via `resolve_relations` (see below) |
+| `viewAllLabel` | Text | "View All" button text - leave **empty to hide** the button (e.g. on the listing page itself) |
+| `viewAllLink` | Link | Where "View All" points (defaults to `/projects`) |
+
+**`project`** - a project detail page under `projects/` (root content type).
+
+| Field | Field type | Notes |
+|---|---|---|
+| `title` | Text | |
+| `cardImage` | Asset (image) | Thumbnail shown on the Latest Projects card |
+| `cardDescription` | Textarea | Summary shown on the card |
+| `sections` | Blocks | Detail-page body - allow `hero`, `feature`, `gallery`, `textBlock`, `cta`, `contactForm` |
+| `seoTitle` / `seoDescription` / `ogImage` / `noIndex` | - | Same as `page` |
+
+> **Projects live in a folder.** Create a `projects/` **folder** whose start page
+> (a `page` at `/projects`) is the "View All" listing, with individual `project`
+> stories beneath it (`projects/civil-projects`, …). The `latestProjects.projects`
+> reference field only lists `project` stories from that folder.
+>
+> **Relation resolution:** `useStory` requests `resolve_relations:
+> ['latestProjects.projects']`, so the referenced project stories arrive fully
+> resolved (their `content` is readable in the component). If you add another
+> reference field, add its `component.field` path there too.
 
 Create a story with slug **`home`** (type `page`) plus `contact` and
 `our-mission` to match the site navigation.
 
 Live preview (the Bridge) works automatically: opening the site inside the
 Storyblok Visual Editor renders draft content and updates as you type.
+
+#### Sync the content model automatically
+Rather than building the blocks above by hand, `npm run sb:sync` pushes them to
+Storyblok for you via the Management API. The block definitions in
+`scripts/storyblok-sync.mjs` are the **source of truth** and mirror this README.
+
+```bash
+# add to .env (git-ignored):
+#   STORYBLOK_MANAGEMENT_TOKEN=...   # Personal Access Token, or a Space Management token
+#   STORYBLOK_SPACE_ID=...           # Space → Settings → General
+npm run sb:sync -- --dry-run    # preview what would change
+npm run sb:sync                 # create/update every block
+```
+
+The sync is idempotent (create-if-missing, else replace the schema) and never
+deletes blocks or touches story content. Note: because it replaces a block's
+schema, **renaming a field only updates the schema - values saved under the old
+field name are not migrated.** Re-enter affected content after a rename.
 
 ## EmailJS setup
 1. Create an email **service** and a **template** in the EmailJS dashboard.
@@ -122,4 +322,5 @@ npm run cf:deploy      # builds and runs `wrangler pages deploy dist`
 | `npm run generate` | Static/prerendered build |
 | `npm run analyze` | Bundle size analysis |
 | `npm run typecheck` | Type-check with `vue-tsc` |
+| `npm run sb:sync` | Push block schemas to Storyblok (Management API) |
 # blackstone-paving

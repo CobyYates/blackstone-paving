@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Blackstone Paving and Construction — Nuxt 4 + Storyblok marketing site (Cloudflare Pages).",
+  "description": "Blackstone Paving and Construction - Nuxt 4 + Storyblok marketing site (Cloudflare Pages).",
   "engines": {
     "node": ">=20.11.0"
   },
   "scripts": {
     "dev": "nuxt dev",
-    "dev:https": "nuxt dev --https",
+    "dev:https": "nuxt dev",
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "nuxt typecheck",
     "analyze": "nuxt analyze",
+    "sb:sync": "node scripts/storyblok-sync.mjs",
     "cf:preview": "wrangler pages dev dist",
     "cf:deploy": "npm run build && wrangler pages deploy dist"
   },

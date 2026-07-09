@@ -1,8 +1,20 @@
 <template>
   <header class="header" :class="{ 'header--scrolled': scrolled }">
     <div class="container header__inner">
-      <NuxtLink to="/" class="header__brand" aria-label="Blackstone Paving — home">
-        <img src="/logo.svg" alt="Blackstone Paving and Construction" width="180" height="40" />
+      <NuxtLink
+        to="/"
+        class="header__brand"
+        aria-label="Blackstone Paving - home"
+      >
+        <NuxtImg
+          src="https://a.storyblok.com/f/293630044478648/1553x537/5231357a0f/blackstone-paving-logo.png"
+          alt="Blackstone Paving and Construction"
+          width="208"
+          height="72"
+          loading="eager"
+          fetchpriority="high"
+          provider="storyblok"
+        />
       </NuxtLink>
 
       <button
@@ -23,12 +35,11 @@
       >
         <ul>
           <li v-for="link in links" :key="link.to">
-            <NuxtLink :to="link.to" @click="open = false">{{ link.label }}</NuxtLink>
+            <NuxtLink :to="link.to" @click="open = false">
+              {{ link.label }}
+            </NuxtLink>
           </li>
         </ul>
-        <BaseButton href="tel:+14355795801" variant="primary" class="header__cta">
-          <AppIcon name="phone" :size="18" /> (435) 579-5801
-        </BaseButton>
       </nav>
     </div>
   </header>
@@ -36,22 +47,25 @@
 
 <script setup lang="ts">
 // Static site chrome. Swap `links` for a Storyblok "navigation" story if you
-// want editors to control the menu — keep the markup and a11y attributes.
+// want editors to control the menu - keep the markup and a11y attributes.
 const links = [
-  { label: 'Home', to: '/' },
-  { label: 'Our Mission', to: '/our-mission' },
-  { label: 'Contact', to: '/contact' },
-]
+  { label: "Home", to: "/" },
+  { label: "Our Mission", to: "/our-mission" },
+  { label: "Contact", to: "/contact" },
+];
 
-const open = ref(false)
-const scrolled = ref(false)
+const open = ref(false);
+const scrolled = ref(false);
 
-const onScroll = () => (scrolled.value = window.scrollY > 20)
-onMounted(() => window.addEventListener('scroll', onScroll, { passive: true }))
-onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+const onScroll = () => (scrolled.value = window.scrollY > 20);
+onMounted(() => window.addEventListener("scroll", onScroll, { passive: true }));
+onBeforeUnmount(() => window.removeEventListener("scroll", onScroll));
 
 // Close the mobile menu on route change.
-watch(() => useRoute().fullPath, () => (open.value = false))
+watch(
+  () => useRoute().fullPath,
+  () => (open.value = false),
+);
 </script>
 
 <style scoped lang="scss">
@@ -62,7 +76,9 @@ watch(() => useRoute().fullPath, () => (open.value = false))
   background: rgba($color-black, 0.85);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid transparent;
-  transition: border-color $transition, background-color $transition;
+  transition:
+    border-color $transition,
+    background-color $transition;
 
   &--scrolled {
     border-bottom-color: $color-charcoal;
@@ -76,7 +92,10 @@ watch(() => useRoute().fullPath, () => (open.value = false))
     min-height: 68px;
   }
 
-  &__brand img { height: 36px; width: auto; }
+  &__brand img {
+    height: 36px;
+    width: auto;
+  }
 
   &__toggle {
     display: inline-flex;
@@ -84,7 +103,9 @@ watch(() => useRoute().fullPath, () => (open.value = false))
     border: 0;
     color: $color-text;
     padding: $space-2;
-    @include respond(md) { display: none; }
+    @include respond(md) {
+      display: none;
+    }
   }
 
   &__nav {
@@ -98,7 +119,9 @@ watch(() => useRoute().fullPath, () => (open.value = false))
     display: none;
     border-bottom: 1px solid $color-charcoal;
 
-    &.is-open { display: flex; }
+    &.is-open {
+      display: flex;
+    }
 
     ul {
       list-style: none;
@@ -123,7 +146,10 @@ watch(() => useRoute().fullPath, () => (open.value = false))
       background: none;
       border: 0;
 
-      ul { flex-direction: row; gap: $space-8; }
+      ul {
+        flex-direction: row;
+        gap: $space-8;
+      }
     }
   }
 

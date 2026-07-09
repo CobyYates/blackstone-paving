@@ -1,7 +1,7 @@
 <template>
   <div v-editable="blok">
     <StoryblokComponent
-      v-for="item in blok.body"
+      v-for="item in blok.sections"
       :key="item._uid"
       :blok="item"
     />
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// Root content type. Storyblok field: `body` (blocks). SEO fields (title,
-// description, keywords, og_image, no_index) are read in the page via useStorySeo.
+// Root content type. Storyblok field: `sections` (blocks). SEO fields (title,
+// description, keywords, ogImage, noIndex) are read in the page via useStorySeo.
 defineProps<{ blok: Record<string, any> }>()
 </script>

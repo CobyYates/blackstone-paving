@@ -13,7 +13,7 @@ export default defineSitemapEventHandler(async () => {
 
   try {
     const res = await $fetch<{ links: Record<string, any> }>(
-      'https://api-us.storyblok.com/v2/cdn/links',
+      'https://api.storyblok.com/v2/cdn/links',
       { query: { token, version: 'published', per_page: 1000 } },
     )
 

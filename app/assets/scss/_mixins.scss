@@ -1,5 +1,5 @@
 // =============================================================================
-// Mixins — auto-injected globally (do NOT @use this file elsewhere).
+// Mixins - auto-injected globally (do NOT @use this file elsewhere).
 // This file needs the tokens directly: `additionalData` injection only applies
 // to entry/component styles, not to files loaded via @use, so we import them here.
 // =============================================================================
@@ -27,7 +27,7 @@
   padding-block: clamp(#{$space-16}, 8vw, #{$space-24});
 }
 
-// Accessible focus ring — apply on interactive elements.
+// Accessible focus ring - apply on interactive elements.
 @mixin focus-ring {
   &:focus-visible {
     outline: 3px solid $color-primary;

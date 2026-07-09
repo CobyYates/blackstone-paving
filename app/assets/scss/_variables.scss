@@ -1,5 +1,5 @@
 // =============================================================================
-// Design tokens — auto-injected into every component's <style lang="scss">.
+// Design tokens - auto-injected into every component's <style lang="scss">.
 // Do NOT @use this file elsewhere; it is prepended globally by Vite.
 // Keep this list lean: every token here is intentional.
 // =============================================================================
@@ -10,10 +10,10 @@ $color-ink:        #1c1c1e; // surfaces on dark
 $color-charcoal:   #2a2a2e;
 $color-white:      #ffffff;
 $color-off-white:  #f5f5f3;
-$color-gray:       #6e6e71;
+$color-gray:       #aaaaaa;
 $color-gray-light: #d0d0d2;
 
-// Accent — construction amber
+// Accent - construction amber
 $color-primary:        #f2a516;
 $color-primary-dark:   #c9860a;
 $color-primary-contrast: #111111;

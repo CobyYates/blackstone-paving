@@ -2,7 +2,15 @@
   <footer class="footer">
     <div class="container footer__grid">
       <div class="footer__col">
-        <img src="/logo.svg" alt="Blackstone Paving and Construction" width="200" height="44" class="footer__logo" />
+        <NuxtImg
+          src="https://a.storyblok.com/f/293630044478648/1553x537/5231357a0f/blackstone-paving-logo.png"
+          alt="Blackstone Paving and Construction"
+          width="231"
+          height="80"
+          loading="lazy"
+          class="footer__logo"
+          provider="storyblok"
+        />
         <p class="footer__tag">
           Asphalt paving, removal, fine grading &amp; site management across
           Salt Lake, Utah &amp; Tooele County.
