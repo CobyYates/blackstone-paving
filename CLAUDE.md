@@ -29,7 +29,7 @@ app/
   assets/scss/            # _variables, _mixins (auto-injected), main.scss (base)
 server/api/__sitemap__/urls.ts   # dynamic sitemap from Storyblok
 public/                   # favicon.svg, logo.svg, static assets
-nuxt.config.ts  wrangler.toml  .env(.example)
+nuxt.config.ts  .env(.example)   # Cloudflare config lives in the Pages dashboard
 ```
 
 ## Golden rules
@@ -118,5 +118,10 @@ npm run cf:deploy  # build + wrangler pages deploy dist
 
 ## Deploy (Cloudflare Pages)
 - Build command `npm run build`, output directory `dist`.
-- Set env vars in the Pages dashboard (Production + Preview) - same keys as `.env.example`.
-- `compatibility_flags = ["nodejs_compat"]` is required (in `wrangler.toml`).
+- Config is managed in the Pages **dashboard** (there is intentionally no
+  `wrangler.toml` - its presence would make the dashboard ignore env vars).
+  Set for Production **and** Preview:
+  - Env vars (same keys as `.env.example`): `NUXT_PUBLIC_STORYBLOK_ACCESS_TOKEN`
+    (or legacy `NUXT_STORYBLOK_ACCESS_TOKEN`) + the `NUXT_PUBLIC_EMAILJS_*` keys.
+  - **Compatibility flag `nodejs_compat`** and compatibility date `2025-07-01`
+    (Settings → Functions) - REQUIRED, or the SSR worker 500s on every request.
