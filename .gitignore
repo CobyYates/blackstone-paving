@@ -11,6 +11,15 @@ dist
 # Dependencies
 node_modules
 
+# package-lock.json is intentionally NOT committed. It's generated on macOS but
+# Cloudflare builds on Linux, and npm's optional-dependency handling (npm/cli#4828)
+# omits the other platform's native binaries (oxc-parser, rollup, esbuild,
+# lightningcss, sharp, …) from a single-platform lockfile — so `npm ci` on Linux
+# fails with "Cannot find native binding". Without a committed lockfile Cloudflare
+# runs `npm install`, which resolves the right per-platform binaries. Node/npm are
+# still pinned via .nvmrc + the "packageManager" field for consistency.
+package-lock.json
+
 # Logs
 logs
 *.log
