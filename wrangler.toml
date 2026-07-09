@@ -14,5 +14,12 @@ compatibility_date = "2025-07-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
-# Secrets (Storyblok token, EmailJS keys, etc.) are NOT stored here.
-# Add them in the Cloudflare dashboard or with:  wrangler pages secret put <NAME>
+# No secrets / [vars] here on purpose. This site deploys via `npm run cf:deploy`
+# from a developer machine: `nuxt build` reads your local (gitignored) .env and
+# bakes the public config - Storyblok CDN token, EmailJS keys, site URL - into
+# the uploaded output. So nothing sensitive is committed to git or stored in the
+# Cloudflare dashboard. Copy .env.example -> .env and fill it in before deploying.
+#
+# (If you ever switch to Cloudflare's git push-to-deploy, the remote build can't
+# see your local .env - you'd then define runtime NUXT_PUBLIC_* vars here under
+# [vars] / [env.preview.vars], or as `wrangler pages secret put` secrets.)

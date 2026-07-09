@@ -43,15 +43,18 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Server-only
     storyblokAccessToken: '', // NUXT_STORYBLOK_ACCESS_TOKEN (also used by the module below)
+    // These are read from process.env at BUILD time (Nuxt auto-loads .env), so a
+    // local `.env` bakes them into the deploy - the app needs no runtime env on
+    // Cloudflare. Values are public (they ship in the browser); the literals are
+    // sensible fallbacks when a var is absent.
     public: {
-      siteUrl: 'https://blackstone-paving.com', // NUXT_PUBLIC_SITE_URL
-      emailjsServiceId: '',   // NUXT_PUBLIC_EMAILJS_SERVICE_ID
-      emailjsTemplateId: '',  // NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
-      emailjsPublicKey: '',   // NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
-      // Analytics (public IDs - safe in the browser). Override per-env with
-      // NUXT_PUBLIC_GTM_ID / NUXT_PUBLIC_GTAG_ID. Injected in app.vue (prod only).
-      gtmId: 'GTM-NLKDP32D',  // NUXT_PUBLIC_GTM_ID  - Google Tag Manager container
-      gtagId: 'G-VELHLHQMLT', // NUXT_PUBLIC_GTAG_ID - GA4 measurement id
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://blackstone-paving.com',
+      emailjsServiceId: process.env.NUXT_PUBLIC_EMAILJS_SERVICE_ID || '',
+      emailjsTemplateId: process.env.NUXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
+      emailjsPublicKey: process.env.NUXT_PUBLIC_EMAILJS_PUBLIC_KEY || '',
+      // Analytics (public IDs - safe in the browser). Injected in app.vue (prod only).
+      gtmId: process.env.NUXT_PUBLIC_GTM_ID || 'GTM-NLKDP32D',   // Google Tag Manager
+      gtagId: process.env.NUXT_PUBLIC_GTAG_ID || 'G-VELHLHQMLT', // GA4 measurement id
     },
   },
 
@@ -169,12 +172,15 @@ export default defineNuxtConfig({
   // ---------------------------------------------------------------------------
   nitro: {
     preset: 'cloudflare-pages',
+    // No build-time prerendering. Pages are rendered by on-request edge SSR
+    // (still full HTML for crawlers) so live Storyblok edits appear immediately
+    // without a redeploy - important since we deploy manually. To trade that for
+    // faster static delivery (content then frozen until the next deploy), you can
+    // re-enable it (the .env token is available at build):
+    //   prerender: { crawlLinks: true, routes: ['/'], failOnError: false }
     prerender: {
-      crawlLinks: true,
-      routes: ['/'],
-      // Don't fail the whole build if a page can't be prerendered (e.g. missing
-      // CMS token in CI) - it falls back to on-request SSR at the edge.
-      failOnError: false,
+      crawlLinks: false,
+      routes: [],
     },
   },
   routeRules: {
