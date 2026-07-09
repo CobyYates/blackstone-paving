@@ -14,7 +14,7 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "node scripts/patch-unenv.mjs && nuxt prepare",
     "typecheck": "nuxt typecheck",
     "analyze": "nuxt analyze",
     "sb:sync": "node scripts/storyblok-sync.mjs",
