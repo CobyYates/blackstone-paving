@@ -64,7 +64,14 @@ export default defineNuxtConfig({
   // the Storyblok iframe/preview, so it costs the public visitor nothing.
   // ---------------------------------------------------------------------------
   storyblok: {
-    accessToken: process.env.NUXT_STORYBLOK_ACCESS_TOKEN,
+    // The module stores this under runtimeConfig.public.storyblok.accessToken,
+    // so the RUNTIME override (Cloudflare secret) is NUXT_PUBLIC_STORYBLOK_ACCESS_TOKEN.
+    // Accept that name at build time too (falling back to the legacy build-only
+    // name) so ONE variable name works for local .env, `cf:deploy`, and a
+    // Cloudflare Pages secret alike.
+    accessToken:
+      process.env.NUXT_PUBLIC_STORYBLOK_ACCESS_TOKEN ||
+      process.env.NUXT_STORYBLOK_ACCESS_TOKEN,
     bridge: true, // live preview in the Storyblok Visual Editor
     apiOptions: {
       region: 'eu', // matches the "Blackstone Paving" space (eu-central-1)

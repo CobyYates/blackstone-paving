@@ -14,12 +14,23 @@ compatibility_date = "2025-07-01"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "dist"
 
-# No secrets / [vars] here on purpose. This site deploys via `npm run cf:deploy`
-# from a developer machine: `nuxt build` reads your local (gitignored) .env and
-# bakes the public config - Storyblok CDN token, EmailJS keys, site URL - into
-# the uploaded output. So nothing sensitive is committed to git or stored in the
-# Cloudflare dashboard. Copy .env.example -> .env and fill it in before deploying.
+# No secrets / [vars] here on purpose - nothing sensitive is committed to git.
 #
-# (If you ever switch to Cloudflare's git push-to-deploy, the remote build can't
-# see your local .env - you'd then define runtime NUXT_PUBLIC_* vars here under
-# [vars] / [env.preview.vars], or as `wrangler pages secret put` secrets.)
+# This project uses Cloudflare git push-to-deploy. The remote build can't see a
+# local .env, so config is supplied as encrypted Pages SECRETS (stored in
+# Cloudflare, not git, not the plaintext vars UI). Because pages render via edge
+# SSR, these runtime values reach the browser through the SSR payload. Set them
+# once (values are public - Storyblok CDN token / EmailJS keys - but kept out of
+# git as a matter of hygiene):
+#
+#   npx wrangler pages secret put NUXT_PUBLIC_STORYBLOK_ACCESS_TOKEN
+#   npx wrangler pages secret put NUXT_PUBLIC_EMAILJS_SERVICE_ID
+#   npx wrangler pages secret put NUXT_PUBLIC_EMAILJS_TEMPLATE_ID
+#   npx wrangler pages secret put NUXT_PUBLIC_EMAILJS_PUBLIC_KEY
+#
+# then re-run the deployment. Preview deployments use a separate secret store;
+# set the same keys for Preview in the dashboard if you use branch previews.
+#
+# Alternative: deploy from your machine with `npm run cf:deploy`, which bakes the
+# local .env into the build instead (then disable git auto-builds so they don't
+# overwrite it with a token-less build).
