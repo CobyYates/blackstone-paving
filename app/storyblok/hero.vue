@@ -9,7 +9,9 @@
       :src="blok.backgroundImage.filename"
       :alt="blok.backgroundImage.alt || ''"
       class="hero__bg"
-      sizes="xs:100vw sm:100vw md:100vw lg:100vw xl:100vw xxl:100vw"
+      sizes="xs:100vw sm:100vw md:100vw lg:100vw"
+      densities="1x"
+      :quality="50"
       loading="eager"
       fetchpriority="high"
       preload
