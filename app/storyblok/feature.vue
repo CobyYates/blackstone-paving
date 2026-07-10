@@ -5,6 +5,8 @@
         <NuxtImg
           :src="blok.image.filename"
           :alt="blok.image.alt || ''"
+          :width="dims?.width"
+          :height="dims?.height"
           sizes="sm:100vw md:50vw lg:600px"
           loading="lazy"
           class="feature__img"
@@ -39,7 +41,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{ blok: Record<string, any> }>()
+const props = defineProps<{ blok: Record<string, any> }>()
+
+// Storyblok asset URLs embed intrinsic dimensions as `.../{width}x{height}/...`.
+// Passing them to NuxtImg reserves layout space and prevents CLS.
+const dims = computed(() => {
+  const m = /\/(\d+)x(\d+)\//.exec(props.blok.image?.filename || '')
+  return m ? { width: Number(m[1]), height: Number(m[2]) } : undefined
+})
 </script>
 
 <style scoped lang="scss">
@@ -55,7 +64,7 @@ defineProps<{ blok: Record<string, any> }>()
 
   &--reverse .feature__media { order: 2; }
 
-  &__img { border-radius: $radius-lg; width: 100%; }
+  &__img { border-radius: $radius-lg; width: 100%; height: auto; }
 
   &__body { display: flex; flex-direction: column; gap: $space-4; }
 

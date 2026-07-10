@@ -27,35 +27,51 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ blok: Record<string, any> }>()
+const props = defineProps<{ blok: Record<string, any> }>();
 
-const items = computed(() => props.blok.items || [])
+const items = computed(() => props.blok.items || []);
 
 // Strip HTML for the JSON-LD answer text.
 const toText = (answer: any): string => {
-  if (!answer) return ''
-  const html = typeof answer === 'string' ? answer : renderRichText(answer)
-  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
-}
+  if (!answer) return "";
+  const html = typeof answer === "string" ? answer : renderRichText(answer);
+  return html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+};
 
 // FAQPage structured data - eligible for rich results in Google.
 useSchemaOrg([
-  defineWebPage({ '@type': 'FAQPage' }),
+  defineWebPage({ "@type": "FAQPage" }),
   ...items.value.map((item: any) =>
-    defineQuestion({ name: item.question, acceptedAnswer: toText(item.answer) }),
+    defineQuestion({
+      name: item.question,
+      acceptedAnswer: toText(item.answer),
+    }),
   ),
-])
+]);
 </script>
 
 <style scoped lang="scss">
 .faq {
-  &__inner { max-width: 820px; }
-  &__header { text-align: center; margin-bottom: $space-12; }
+  background: $color-white;
+  color: $color-charcoal;
+
+  &__inner {
+    max-width: 820px;
+  }
+  &__header {
+    text-align: center;
+    margin-bottom: $space-12;
+  }
 
   &__item {
-    border-bottom: 1px solid $color-charcoal;
+    border-bottom: 1px solid $color-gray-light;
 
-    &[open] .faq__icon { transform: rotate(45deg); }
+    &[open] .faq__icon {
+      transform: rotate(45deg);
+    }
   }
 
   &__q {
@@ -66,22 +82,34 @@ useSchemaOrg([
     padding: $space-6 0;
     font-weight: $fw-semibold;
     font-size: $fs-lg;
+    color: $color-black;
     list-style: none;
     cursor: pointer;
     @include focus-ring;
 
-    &::-webkit-details-marker { display: none; }
+    &::-webkit-details-marker {
+      display: none;
+    }
   }
 
-  &__icon { color: $color-primary; transition: transform $transition; }
+  &__icon {
+    color: $color-primary-dark;
+    transition: transform $transition;
+  }
 
-  &__a { padding-bottom: $space-6; color: $color-text-muted; }
+  &__a {
+    padding-bottom: $space-6;
+    color: $color-charcoal;
+  }
 }
-.eyebrow {
+.faq .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: $fw-semibold;
-  color: $color-primary;
+  color: $color-primary-on-light;
   font-size: $fs-sm;
+}
+.faq h2 {
+  color: $color-black;
 }
 </style>

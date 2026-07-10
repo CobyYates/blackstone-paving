@@ -33,11 +33,14 @@
         </div>
       </div>
 
-      <ul v-if="blok.services?.length" class="hero__services">
-        <li v-for="card in blok.services" :key="card._uid">
-          <StoryblokComponent :blok="card" />
-        </li>
-      </ul>
+      <div v-if="blok.services?.length" class="hero__services-wrap">
+        <h2 class="visually-hidden">Our services</h2>
+        <ul class="hero__services">
+          <li v-for="card in blok.services" :key="card._uid">
+            <StoryblokComponent :blok="card" />
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </template>

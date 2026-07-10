@@ -74,6 +74,9 @@ const showViewAll = computed(
 
 <style scoped lang="scss">
 .latest {
+  background: $color-white;
+  color: $color-charcoal;
+
   &__header { text-align: center; margin-bottom: $space-12; }
 
   &__grid {
@@ -110,15 +113,18 @@ const showViewAll = computed(
   }
 
   &__body { display: flex; flex-direction: column; gap: $space-3; align-items: flex-start; }
-  &__title { font-size: $fs-lg; }
-  &__desc { color: $color-text-muted; font-size: $fs-sm; }
+  &__title { font-size: $fs-lg; color: $color-black; }
+  &__desc { color: $color-charcoal; font-size: $fs-sm; }
   &__btn { margin-top: $space-2; }
 }
-.eyebrow {
+.latest .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-weight: $fw-semibold;
-  color: $color-primary;
+  color: $color-primary-on-light;
   font-size: $fs-sm;
+}
+.latest h2 {
+  color: $color-black;
 }
 </style>
